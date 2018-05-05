@@ -3,7 +3,9 @@ var VisualRecognitionV3 = require('watson-developer-cloud/visual-recognition/v3'
 
 // Crear servidor en Node
 var http = require('http');
-var https = require('https');
+
+// Obtener rutas
+var ruta = require("path");
 
 // Modulo de parseo de los datos de un formulario, incluyendo la subida de ficheros (multipart/form-data).
 var formidable = require('formidable');
@@ -14,86 +16,57 @@ var fs = require('fs');
 // Puerto para el servidor
 var port = process.env.PORT || 17202;
 
-var httpsOptions = {
-        cert: fs.readFileSync(path.join(__dirname, "ssl", "tecnops.crt")),
-        key: fs.readFileSync(path.join(__dirname, "ssl", "tecnops.key"))
-    }
-    // Creamos el servidor
-https.createServer(httpsOptions, function(req, res) {
-    //http.createServer(function(req, res) {
-
-    // Donde va el proceso
-    console.log("1");
-
-    // Ruta para subir enviar el fichero
-    if (req.url == '/uploadImage') {
-
-        // Donde va el proceso
-        console.log("2");
+// Creamos el servidor
+http.createServer(function(req, res) {
+    if (req.url == "/") {
+        fs.readFile('index.html', function(error, contenido_archivo) {
+            if (error) {
+                res.writeHead(500, 'text/plain');
+                res.end('Error interno.');
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(contenido_archivo);
+            }
+        });
+    } else if (req.url == "/uploadImage") {
 
         // Creamos un nuevo formulario de entrada
         var form = new formidable.IncomingForm();
 
         // Analiza una solicitud entrante de node.js que contiene datos de formulario (Enviando archivos y campos)
         form.parse(req, function(err, fields, files) {
-            // Donde va el proceso
-            console.log("3");
+            // Error
+            if (err) throw err;
 
-            // Archivo temporal
-            var tempPath = files.photo.path;
+            // API DE IBM Watson
+            // 1 - Se autentica en la API de reconocimiento visual al proporcionar la clave API para la instancia de servicio que desea utilizar. 
+            var visualRecognition = new VisualRecognitionV3({
+                version: '2018-03-19',
+                api_key: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+            });
 
-            // Nuevo archivo
-            var newpath = 'uploads/' + files.photo.name;
+            // La función fs.createReadStream () le permite abrir una secuencia legible de una manera muy simple. Todo lo que tiene que hacer es pasar la ruta del archivo para comenzar a transmitir
+            var images_file = fs.createReadStream(files.photo.path);
 
-            // Asynchronous rename (Cuando estan preparados los guardamos)
-            fs.rename(tempPath, newpath, function(err) {
+            // La puntuación mínima que una clase debe tener para mostrarse en la respuesta 0.0 => ignora la clasificación y devuelve todo
+            var threshold = 0.0;
 
-                // Donde va el proceso
-                console.log("4");
+            // Parametros (documentacion muy bien explicada)
+            var params = { images_file: images_file, threshold: threshold, accept_language: "es" };
 
-                // Error
-                if (err) throw err;
+            // Donde vamos
+            console.log("6");
 
-                // Donde va el proceso
-                console.log("5");
-
-                // API DE IBM Watson
-                // 1 - Se autentica en la API de reconocimiento visual al proporcionar la clave API para la instancia de servicio que desea utilizar. 
-                var visualRecognition = new VisualRecognitionV3({
-                    version: '2018-03-19',
-                    api_key: ''
-                });
-
-                // La función fs.createReadStream () le permite abrir una secuencia legible de una manera muy simple. Todo lo que tiene que hacer es pasar la ruta del archivo para comenzar a transmitir
-                var images_file = fs.createReadStream(newpath);
-
-                // La puntuación mínima que una clase debe tener para mostrarse en la respuesta 0.0 => ignora la clasificación y devuelve todo
-                var threshold = 0.0;
-
-                // Parametros (documentacion muy bien explicada)
-                var params = { images_file: images_file, threshold: threshold, accept_language: "es" };
-
-                // Donde vamos
-                console.log("6");
-
-                // Comienza la clasificación
-                visualRecognition.classify(params, function(err, response) {
-
-                    // Donde vamos
-                    console.log("7");
-
-                    // Mostrar en la consola
-                    err ? console.log(err) : console.log(JSON.stringify(response, null, 2));
-
-                    // Enviamos una cadena de texto JSON
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify(response));
-                });
+            // Comienza la clasificación
+            visualRecognition.classify(params, function(err, response) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(response));
             });
         });
     } else {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: true, message: "Error Endpoint" }));
+        var codigo_html = '';
+        res.writeHead(200, 'text/html');
+        res.end(codigo_html);
     }
 }).listen(port);
 console.log(`Servidor funcionando en el puerto ${port}`);

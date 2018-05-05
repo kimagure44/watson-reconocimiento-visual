@@ -6,8 +6,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>CLASIFICADOR WATSON</title>
-    <link href="style.css" rel="stylesheet">
+    <!--<link href="style.css" rel="stylesheet">-->
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        #resultado div {
+            width: 45%;
+            float: left;
+            overflow: auto;
+            padding: 15px;
+        }
+        
+        .clasificacion b {
+            text-transform: capitalize;
+        }
+        
+        .clasificacion ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .loader {
+            border: 10px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 10px solid #3498db;
+            width: 60px;
+            height: 60px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            left: calc(50% - 30px);
+            top: calc(50% - 30px);
+            display: none;
+        }
+        
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -22,7 +75,86 @@
         </div>
         <div class="loader"></div>
     </main>
-    <script src="index.js"></script>
+    <script>
+        var WATSON = WATSON || {};
+
+        WATSON = {
+            showLoading: function(status) {
+                document.querySelector(".loader").style.display = status ? "block" : "none";
+            },
+            ajax: function(url, evt) {
+                return new Promise(function(resolve, reject) {
+                    debugger;
+                    var request = new XMLHttpRequest();
+                    request.open('POST', url, true);
+                    request.onreadystatechange = function(aEvt) {
+                        debugger;
+                        if (request.readyState == 4) {
+                            var html = "";
+                            if (request.status == 200) {
+                                var responseJSON = JSON.parse(request.responseText);
+                                html += "<h3>Imagenes procesadas: " + responseJSON.images_processed + "</h3>";
+                                var clasi = responseJSON.images[0]["classifiers"][0]["classes"];
+                                clasi.sort(function(a, b) {
+                                    return b.score - a.score;
+                                });
+                                for (var propiedad in clasi) {
+                                    if (clasi.hasOwnProperty(propiedad)) {
+                                        html += "<ul>";
+                                        typeof clasi[propiedad].class !== "undefined" ? html += "<li><b>" + clasi[propiedad].class + "</b></li>" : html += "";
+                                        typeof clasi[propiedad].score !== "undefined" ? html += "<li><progress value='" + (clasi[propiedad].score * 100) + "' max='100'></progress> <b>" + clasi[propiedad].score + "</b></li>" : html += "";
+                                        //typeof clasi[propiedad].type_hierarchy !== "undefined" ? html += "<b>" + clasi[propiedad].type_hierarchy + "</b><br>" : html += "<br>";
+                                        html += "</ul>";
+                                    }
+                                }
+                                resolve(html);
+                            } else {
+                                html += "Error loading page";
+                                reject(html);
+
+                            }
+                        }
+                    };
+                    request.send(new FormData(evt.target));
+                });
+            }
+        };
+        window.onload = function() {
+            var form = document.querySelector('form');
+            var submit = document.querySelector("input[type='file']");
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                WATSON.showLoading(true);
+                WATSON.ajax('http://tecnops.es:17202/uploadImage', e).then(function(success) {
+                    WATSON.showLoading(false);
+                    document.querySelector(".clasificacion").innerHTML = success;
+                }).catch(function(err) {
+                    WATSON.showLoading(false);
+                    document.querySelector(".clasificacion").innerHTML = err;
+                });
+            });
+
+            submit.addEventListener("change", function(evt) {
+                debugger;
+                var files = evt.target.files;
+                for (var data in files) {
+                    if (files.hasOwnProperty(data) && files[data].type.match("image.*")) {
+                        var reader = new FileReader();
+                        reader.onload = (function(theFile) {
+                            return function(e) {
+                                var img = document.querySelector("img");
+                                img.src = e.target.result;
+                                img.title = escape(theFile.name);
+                                img.classList.add("show");
+                                document.querySelector("input[type='submit']").removeAttribute("disabled");
+                            };
+                        })(files[data]);
+                        reader.readAsDataURL(files[data]);
+                    }
+                }
+            }, false);
+        };
+    </script>
 </body>
 
 </html>
