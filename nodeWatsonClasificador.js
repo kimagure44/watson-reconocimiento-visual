@@ -3,6 +3,7 @@ var VisualRecognitionV3 = require('watson-developer-cloud/visual-recognition/v3'
 
 // Crear servidor en Node
 var http = require('http');
+var https = require('https');
 
 // Modulo de parseo de los datos de un formulario, incluyendo la subida de ficheros (multipart/form-data).
 var formidable = require('formidable');
@@ -13,8 +14,14 @@ var fs = require('fs');
 // Puerto para el servidor
 var port = process.env.PORT || 17202;
 
-// Creamos el servidor
-http.createServer(function(req, res) {
+var httpsOptions = {
+        cert: fs.readFileSync(path.join(__dirname, "ssl", "tecnops.crt")),
+        key: fs.readFileSync(path.join(__dirname, "ssl", "tecnops.key"))
+    }
+    // Creamos el servidor
+https.createServer(httpsOptions, function(req, res) {
+    //http.createServer(function(req, res) {
+
     // Donde va el proceso
     console.log("1");
 
@@ -54,7 +61,7 @@ http.createServer(function(req, res) {
                 // 1 - Se autentica en la API de reconocimiento visual al proporcionar la clave API para la instancia de servicio que desea utilizar. 
                 var visualRecognition = new VisualRecognitionV3({
                     version: '2018-03-19',
-                    api_key: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                    api_key: ''
                 });
 
                 // La función fs.createReadStream () le permite abrir una secuencia legible de una manera muy simple. Todo lo que tiene que hacer es pasar la ruta del archivo para comenzar a transmitir
