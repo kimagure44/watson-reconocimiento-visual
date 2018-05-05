@@ -45,7 +45,7 @@ window.onload = function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         WATSON.showLoading(true);
-        WATSON.ajax('http://localhost:3000/uploadImage', e).then(function(success) {
+        WATSON.ajax('http://tecnops:17202/uploadImage', e).then(function(success) {
             WATSON.showLoading(false);
             document.querySelector(".clasificacion").innerHTML = success;
         }).catch(function(err) {
