@@ -11,7 +11,7 @@ var formidable = require('formidable');
 var fs = require('fs');
 
 // Puerto para el servidor
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 17202;
 
 // Creamos el servidor
 http.createServer(function(req, res) {
@@ -84,6 +84,9 @@ http.createServer(function(req, res) {
                 });
             });
         });
+    } else {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: true, message: "Error Endpoint" }));
     }
 }).listen(port);
 console.log(`Servidor funcionando en el puerto ${port}`);
