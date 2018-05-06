@@ -13,11 +13,6 @@
             font-family: 'Montserrat', sans-serif;
         }
         
-        #resultado div {
-            width: 100%;
-            float: left;
-        }
-        
         .clasificacion b {
             text-transform: capitalize;
         }
@@ -64,6 +59,27 @@
             max-width: 300px;
             box-shadow: 1px 0px 10px rgba(0, 0, 0, 0.3);
             margin: 5px;
+        }
+        
+        @media all and (min-width:992px) {
+            .imagen img.show {
+                width: 100%;
+            }
+            #resultado div {
+                width: 48%;
+                float: left;
+                margin: 5px;
+            }
+        }
+        
+        @media all and (max-width:991px) {
+            .imagen img.show {
+                width: 100%;
+            }
+            #resultado div {
+                width: 100%;
+                float: left;
+            }
         }
     </style>
 </head>
