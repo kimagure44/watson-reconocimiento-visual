@@ -146,7 +146,7 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 WATSON.showLoading(true);
-                WATSON.ajax('http://tecnops.es:17202/uploadImage', e).then(function(success) {
+                WATSON.ajax('http://tecnops.es:18124/uploadImage', e).then(function(success) {
                     WATSON.showLoading(false);
                     document.querySelector(".clasificacion").innerHTML = success;
                 }).catch(function(err) {
