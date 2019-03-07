@@ -105,11 +105,9 @@
             },
             ajax: function(url, evt) {
                 return new Promise(function(resolve, reject) {
-                    debugger;
                     var request = new XMLHttpRequest();
                     request.open('POST', url, true);
                     request.onreadystatechange = function(aEvt) {
-                        debugger;
                         if (request.readyState == 4) {
                             var html = "";
                             if (request.status == 200) {
@@ -156,7 +154,6 @@
             });
 
             submit.addEventListener("change", function(evt) {
-                debugger;
                 var files = evt.target.files;
                 for (var data in files) {
                     if (files.hasOwnProperty(data) && files[data].type.match("image.*")) {

@@ -42,7 +42,7 @@ http.createServer(function(req, res) {
             // 1 - Se autentica en la API de reconocimiento visual al proporcionar la clave API para la instancia de servicio que desea utilizar. 
             var visualRecognition = new VisualRecognitionV3({
                 version: '2018-03-19',
-                api_key: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                iam_apikey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
             });
 
             // La función fs.createReadStream () le permite abrir una secuencia legible de una manera muy simple. Todo lo que tiene que hacer es pasar la ruta del archivo para comenzar a transmitir
