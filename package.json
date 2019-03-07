@@ -1,0 +1,24 @@
+{
+  "name": "watson-reconocimiento-visual",
+  "version": "1.0.0",
+  "main": "nodeWatsonClasificador.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "formidable": "^1.2.1",
+    "watson-developer-cloud": "^3.18.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimagure44/watson-reconocimiento-visual.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kimagure44/watson-reconocimiento-visual/issues"
+  },
+  "homepage": "https://github.com/kimagure44/watson-reconocimiento-visual#readme",
+  "description": ""
+}
